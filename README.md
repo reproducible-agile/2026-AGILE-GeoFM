@@ -86,9 +86,10 @@ Run the evaluation of the models like specified in the following. You can change
 
     The used CLIP model can be changed using the `--clip_model_name` flag. For RemoteCLIP, choose ViT-B-32 or ViT-L-14, while ViT-bigG-14 if for the original CLIP model without fine-tuning on geospatial data. `--clip_threshold` specifies the minimum CLIP confidence required to retain SAM-generated masks classified as the target label.
 
-    To train a few-shot adapter for CLIP and then evaluate it with SAM Automatic: First create a folder of images with at least the number of shots to be used from the foreground (buildings or water surfaces) and the background. These should be under the folders data/bbd1k_cache/foreground and data/bbd1k_cache/background, respectively. Such images can be for example extracted frrom the dataset with the help of the ground truth masks.
+    Few-shot adapter: 
+    
+    First, we generate foreground (buildings or water surfaces) and background images for few-shot training (done with src/generate_data_tip_adapter_f.py). Then, we train a few-shot adapter for CLIP (done with src/train_tip_adapter_f.py). We evaluate it with SAM Automatic:
     ```
-    python3 src/train_tip_adapter_f.py --cache_dir data/bbd1k_cache/ --label buildings
     python3 src/sam_automatic_label.py --dataset bbd1k --label buildings --few-shot --cache_dir data/bbd1k_cache/
     ```
 
