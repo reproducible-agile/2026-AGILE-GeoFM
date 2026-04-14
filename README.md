@@ -19,6 +19,7 @@ wget -q https://huggingface.co/google-bert/bert-base-uncased/resolve/main/vocab.
 ```
 
 ## Download RemoteSAM GitHub Repository
+Clone the RemoteSAM repo under the main project folder:
 ```
 git clone https://github.com/1e12Leon/RemoteSAM.git
 ```
@@ -56,7 +57,7 @@ Run the evaluation of the models like specified in the following. You can change
 
 1. Evaluate SAM with prompts from ground-truth masks
     ```
-    python3 src/sam_gt_prompt.py --dataset bbd1k
+    python3 src/sam_gt_prompt.py --dataset bbd1k --model_name large --prompt bb
     ```
 
     The following prompt types are supported:
@@ -64,13 +65,13 @@ Run the evaluation of the models like specified in the following. You can change
 
     2. `--prompt center_pt` : center point of mask geometries
 
-    3. `--prompt multiple_pts` : multiple points randomly generated within each mask geometry (`--nr_pts` to specify the number of points in each gemoetry)
+    3. `--prompt multiple_pts` : multiple points randomly generated within each mask geometry (`--nr_pts` to specify the number of points in each geometry)
 
     4. `--prompt foreground_background_pts` : background and foreground set of randomly generated points (`--nr_pts` to specify the number of points in each of the foreground and background)
 
 2. Evaluate SAM with bounding box prompt generated from text prompts run through GroundingDINO:
     ```
-    python3 src/sam_dino_prompt.py --dataset bbd1k --text_prompt building
+    python3 src/sam_dino_prompt.py --dataset bbd1k --model_name large --dino_model_name SwinT --box_threshold 0.35 --text_threshold 0.25 --text_prompt building
     ```
 
     Multiple text prompts can be passed as such `--text_prompt "river . stream . lake ."`
@@ -79,7 +80,7 @@ Run the evaluation of the models like specified in the following. You can change
 
 3. Evaluate SAM Automatic classified with CLIP, RemoteCLIP and a trained few-shot adapter for CLIP (Tip-Adapter):
     ```
-    python3 src/sam_automatic_label.py --dataset bbd1k --label buildings
+    python3 src/sam_automatic_label.py --dataset bbd1k --model_name large --points_per_side 32 --clip_model_name ViT-bigG-14 --clip_threshold 0.7 --label buildings
     ```
 
     SAM Automatic can be parameterized with `--points_per_side`, which specifies how many points are sampled uniformly along each side of the image. This results in a total of points_per_side**2 sampled points across the image.
@@ -88,9 +89,9 @@ Run the evaluation of the models like specified in the following. You can change
 
     Few-shot adapter: 
     
-    First, we generate foreground (buildings or water surfaces) and background images for few-shot training (done with src/generate_data_tip_adapter_f.py). Then, we train a few-shot adapter for CLIP (done with src/train_tip_adapter_f.py). We evaluate it with SAM Automatic:
+    First, we generate foreground (buildings or water surfaces) and background images for few-shot training (done with src/generate_data_tip_adapter_f.py). Then, we train a few-shot adapter for CLIP (done with src/train_tip_adapter_f.py). Pretrained models are provided under data/bbd1k_cache and data/water1k_cache. We evaluate it with SAM Automatic:
     ```
-    python3 src/sam_automatic_label.py --dataset bbd1k --label buildings --few-shot --cache_dir data/bbd1k_cache/
+    python3 src/sam_automatic_label.py --dataset bbd1k --model_name large --points_per_side 32 --clip_model_name ViT-bigG-14 --clip_threshold 0.7 --label buildings --few-shot --cache_dir data/bbd1k_cache/ --shots 8 --beta 5 --alpha 1
     ```
 
     Training parameters like `--shots`, `--lr`, `--augment_epoch`, `--train_epoch`, `--beta` and `--alpha` can be adapted as necessary.
